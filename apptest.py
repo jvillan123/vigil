@@ -17,20 +17,27 @@ firebaseConfig = {
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
-
-
-
+db = firebase.database()
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = 'bT4YXj2gdI7jAzEJQVuuYO4KsgEU14H5'
+
+# message="/Classroom%201"
+# def stream_handler(message):
+#    print(message)
+# my_stream = db.child("/Classroom%201").stream(stream_handler)
+
 
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template('home.html',)
 
+
 @app.route("/about")
 def about():
     return render_template('about.html')
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -40,11 +47,23 @@ def register():
         return redirect(url_for('home'))
     return render_template('user_reg.html', title='Register', form=form)
 
+
 @app.route("/log_in")
 def log_in():
     form = log_in_form()
     return render_template('user_login.html', title='Login', form=form)
 
+
+@app.route("/roster", methods=['GET', 'POST'])
+def roster():
+    # print(message["event"])
+    # print(message["/Classroom%201"])
+    # print(message["data"])
+    # my_stream = db.child("posts").stream(stream_handler)
+    # return render_template('roster.html', events=my_stream)
+    # db_temp = db.child("/Classroom%201/1st%20Period").get().val()
+    db_temp = db.child("/Classroom%201/1st%20Period").get().val().items()
+    return render_template('roster.html', events=db_temp)
 
 if __name__ == '__main__':
     app.run(debug=True)
