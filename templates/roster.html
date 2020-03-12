@@ -4,12 +4,25 @@
         <!--<form action="" method="post">
         </form>-->
         <div>
-            {% for list in events %}
-                <ul>
-                    <li>
-                        {{ list }}
-                    </li>
-                </ul>
-            {% endfor %}
+            <table>
+                <thead>
+                    <tr>
+                       <th scope="col">Student</th>
+                        <th scope="col">Last Attended Class</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for key, val in events %}
+                   <tr>
+                       <th> {{key}} </th>
+                       <td> {{val}} </td>
+                       {% if  %}
+                       <td>  </td>
+                       {% endif %}
+                   </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
 {% endblock content %}

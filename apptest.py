@@ -1,6 +1,8 @@
 from forms import Registration, log_in_form
 from flask import Flask, render_template, url_for, flash, redirect
 import pyrebase
+from firebase_admin import db as data
+import datetime
 from getpass import getpass
 
 
@@ -48,9 +50,17 @@ def register():
     return render_template('user_reg.html', title='Register', form=form)
 
 
-@app.route("/log_in")
-def log_in():
+@app.route("/login", methods=['GET','POST'])
+def login():
     form = log_in_form()
+    if form.validate_on_submit():
+        try:
+            user = auth.sign_in_with_email_and_password(email=form.email.data, password=form.password.data)
+            flash(f'Login Successful!', 'success')
+            return redirect(url_for('roster'))
+        except:
+            flash(f'Login Failed! Please check your Username and Password.', 'danger')
+
     return render_template('user_login.html', title='Login', form=form)
 
 
@@ -62,8 +72,13 @@ def roster():
     # my_stream = db.child("posts").stream(stream_handler)
     # return render_template('roster.html', events=my_stream)
     # db_temp = db.child("/Classroom%201/1st%20Period").get().val()
-    db_temp = db.child("/Classroom%201/1st%20Period").get().val().items()
-    return render_template('roster.html', events=db_temp)
+
+    db_attended = db.child("/Classroom%201/1st%20Period/Attended").get().val().items()
+    db_absent = db.child("/Classroom%201/1st%20Period/Absent").get().val().items()
+    absent = list(db_absent)
+    attended = list(db_attended)
+
+    return render_template('roster.html', events=attended, )
 
 if __name__ == '__main__':
     app.run(debug=True)
