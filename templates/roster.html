@@ -13,15 +13,16 @@
                     </tr>
                 </thead>
                 <tbody>
+
                 {% for key, val in events %}
                    <tr>
                        <th> {{key}} </th>
                        <td> {{val}} </td>
-                       {% if  %}
-                       <td>  </td>
-                       {% endif %}
+                       <td> {{status[val]}} </td>
+
                    </tr>
                 {% endfor %}
+
                 </tbody>
             </table>
         </div>

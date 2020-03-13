@@ -74,11 +74,37 @@ def roster():
     # db_temp = db.child("/Classroom%201/1st%20Period").get().val()
 
     db_attended = db.child("/Classroom%201/1st%20Period/Attended").get().val().items()
-    db_absent = db.child("/Classroom%201/1st%20Period/Absent").get().val().items()
-    absent = list(db_absent)
+    db_classtime = db.child("/Classroom%201/1st%20Period/ClassTime").get()
+    time = datetime.datetime.strptime(db_classtime.val(),"(%I:%M:%S %p)")
     attended = list(db_attended)
 
-    return render_template('roster.html', events=attended, )
+    current_date = datetime.datetime.today()
+    current_date = current_date.date()
+
+    late_time = datetime.datetime.combine(current_date,(time + datetime.timedelta(hours=0, minutes=5)).time())
+    late_time = datetime.datetime.strptime(late_time.strftime("%d-%b-%Y (%I:%M:%S %p)"), "%d-%b-%Y (%I:%M:%S %p)")
+
+    absent_time = datetime.datetime.combine(current_date ,(time + datetime.timedelta(hours=0, minutes=15)).time())
+    absent_time = datetime.datetime.strptime(absent_time.strftime("%d-%b-%Y (%I:%M:%S %p)"), "%d-%b-%Y (%I:%M:%S %p)")
+
+    date_time = datetime.datetime.combine(current_date,time.time())
+    date_time = datetime.datetime.strptime(date_time.strftime("%d-%b-%Y (%I:%M:%S %p)"), '%d-%b-%Y (%I:%M:%S %p)')
+
+    student_status = {}
+    for key, val in attended:
+        log_time = datetime.datetime.strptime(val,"%d-%b-%Y (%I:%M:%S %p)")
+        if log_time.date() < date_time.date():
+            student_status[val] = "Absent"
+        elif date_time.time() <= log_time.time() < late_time.time():
+            student_status[val] = "Present"
+        elif late_time.time() <= log_time.time() < absent_time.time():
+            student_status[val] = "Late"
+        else:
+            student_status[val] = "Absent"
+
+
+
+    return render_template('roster.html', events=attended, status=student_status )
 
 if __name__ == '__main__':
     app.run(debug=True)
